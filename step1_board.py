@@ -7,14 +7,7 @@ enemy_base = (BOARD_SIZE - 1, BOARD_SIZE -1) # Правый нижний - ба�
 tower_pos = (BOARD_SIZE//2, BOARD_SIZE//2) # Центр - башня
 
 # Юниты (список словарей)
-units = [
-    {
-        'type': 'warrior',
-        'owner': 'Player',
-        'pos': (0,1),
-        'symbol': 'PW '  #Player Warrior
-    }
-]
+units = []
 
 # Отрисовка поля
 def draw_board():
@@ -36,26 +29,65 @@ def draw_board():
                 row += '[ . ]'  # Пустая клетка
         print(row)
 
+# Создание юнита
+def create_unit():
+    unit = {
+        'type': 'warriot',
+        'owner': 'Player',
+        'pos': player_base,
+        'symbol': 'PW '
+    }
+    units.append(unit)
+    print("Юнит создан и размещён на базе игрока.")
+
 # Переместить юнита
-def move_unit(unit_index, dx, dy):
-    unit = units[unit_index]
-    x, y = unit['pos']
-    new_x = x + dx
-    new_y = y + dy
+def move_unit():
+    if not units:
+        print("Нет доступных юнитов.")
+        return
 
-    # Проверка: в пределах ли поля
-    if 0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE:
-        unit['pos'] = (new_x, new_y)
-        print(f"Юнит перемещён на {unit['pos']}")
-    else:
-        print(f"Ход невозможен - вне карты!")
+    print("\nДоступные юниты:")
+    for i, u in enumerate(units):
+        print(f"{i}: {u['symbol']} на {u['pos']}")
 
-# Основной код
-draw_board()
+    try:
+        index = int(input("Выберите юнита по номеру: "))
+        dx = int(input("Сдвиг по X (-1, 0, 1): "))
+        dy = int(input("Сдвиг по Y (-1, 0, 1): "))
 
-# Пример перемещения
-print("\nДвигаем юнита вниз...")
-move_unit(0, 0, 1)
+        unit = units[index]
+        new_x = unit['pos'][0] + dx
+        new_y = unit['pos'][1] + dy
 
-print("\nНовое поле:")
-draw_board()
+        if 0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE:
+            unit['pos'] = (new_x, new_y)
+            print(f"Юнит перемещён на {unit['pos']}")
+        else:
+            print("Ход вне карты!")
+
+    except (ValueError, IndexError):
+        print("Некорректный ввод")
+
+# Главный цикл игры
+def game_loop():
+    while True:
+        print("\n=== Ход игрока ===")
+        draw_board()
+        print("\nВыберите действие:")
+        print("1 - Создать юнита")
+        print("2 - Переместить юнита")
+        print("3 - Выход")
+
+        choice = input("Ваш выбор: ")
+        if choice == "1":
+            create_unit()
+        elif choice == "2":
+            move_unit()
+        elif choice == "3":
+            print("Выход из игры.")
+            break
+        else:
+            print("Неверная команда")
+
+# Запуск игры
+game_loop()
