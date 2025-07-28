@@ -106,6 +106,34 @@ def enemy_turn():
             new_y = max(0, y-1)
             u['pos'] = (new_x, new_y)
 
+tower_control = None
+tower_progress = 0
+
+def check_tower():
+    global tower_control, tower_progress
+
+    occupiers = [u for u in units if u['pos'] == tower_pos]
+    if len(occupiers) == 1:
+        owner = occupiers[0]['owner']
+        if tower_control == owner:
+            tower_progress += 1
+        else:
+            tower_control = owner
+            tower_progress = 1
+        print(f"🏰 {owner} удерживает башню ({tower_progress}/3)")
+    else:
+        tower_control = None
+        tower_progress = 0
+
+    if tower_progress >= 3:
+        print(f"\n🏆 {tower_control} ПОБЕЖДАЕТ, ЗАХВАТИВ БАШНЮ!")
+        return True
+    return False
+
+def end_game():
+    print("\n🎮 Игра окончена.")
+    exit()
+
 # Главный цикл игры
 def game_loop():
     turn = 1
@@ -115,7 +143,7 @@ def game_loop():
         print("\nВыберите действие:")
         print("1 - Создать юнита")
         print("2 - Переместить юнита")
-        print("3 - Выход")
+        print("3 - Выйти из игры")
 
         choice = input("Ваш выбор: ")
         if choice == "1":
@@ -129,8 +157,15 @@ def game_loop():
             print("Неверная команда")
 
         resolve_combat()
+        if check_tower():
+            end_game()
+
+
         enemy_turn()
         resolve_combat()
+        if check_tower():
+            end_game()
+
         turn += 1
 
 # Старт
